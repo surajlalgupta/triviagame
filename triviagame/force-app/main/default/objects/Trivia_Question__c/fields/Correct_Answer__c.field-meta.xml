@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Correct_Answer__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Salesforce Trivia Multiplayer Game: Lookup to correct answer</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Lookup to correct answer</inlineHelpText>
+    <label>Correct Answer</label>
+    <referenceTo>Trivia_Answer__c</referenceTo>
+    <relationshipLabel>Trivia Questions</relationshipLabel>
+    <relationshipName>Trivia_Questions</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Did_Answer__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Salesforce Trivia Multiplayer Game: indicates if the question was answered by the candidate or not</description>
+    <externalId>false</externalId>
+    <inlineHelpText>indicates if the question was answered by the candidate or not</inlineHelpText>
+    <label>Did Answer?</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

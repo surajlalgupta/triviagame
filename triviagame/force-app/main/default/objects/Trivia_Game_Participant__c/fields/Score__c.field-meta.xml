@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Score__c</fullName>
+    <defaultValue>0</defaultValue>
+    <description>Salesforce Trivia Multiplayer Game: Score for the related game and related participant</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Score for the related game and related participant</inlineHelpText>
+    <label>Score</label>
+    <precision>6</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

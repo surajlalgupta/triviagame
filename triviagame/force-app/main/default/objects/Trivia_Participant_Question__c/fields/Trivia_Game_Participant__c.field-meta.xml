@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Trivia_Game_Participant__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Salesforce Trivia Multiplayer Game: lookup to Trivia Game Participant</description>
+    <externalId>false</externalId>
+    <inlineHelpText>lookup to Trivia Game Participant</inlineHelpText>
+    <label>Trivia Game Participant</label>
+    <referenceTo>Trivia_Game_Participant__c</referenceTo>
+    <relationshipLabel>Trivia Participant Questions</relationshipLabel>
+    <relationshipName>Trivia_Participant_Questions</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

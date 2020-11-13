@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Mobile_Number__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>Salesforce Trivia Multiplayer Game: Mobile Number, could have been of type phone however, phone fields can not be set as unique so had to choose text as field type.</description>
+    <externalId>true</externalId>
+    <inlineHelpText>Mobile Number which was first used to register and participate for the game</inlineHelpText>
+    <label>Mobile Number</label>
+    <length>40</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

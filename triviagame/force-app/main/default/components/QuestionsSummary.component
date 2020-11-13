@@ -1,0 +1,20 @@
+<apex:component controller="QuestionSummaryCtlr" access="global">
+	<apex:attribute name="participantId" description="This is the reference to the game participant"
+        type="Id" assignTo="{!playerId}"/>
+    <apex:attribute name="gameId" description="This is the reference to the game"
+        type="Id" assignTo="{!gameIds}"/>
+    <apex:repeat var="question" value="{!questions}">
+        <div>
+            <p>Question: {!question.body}</p>
+            <apex:repeat var="answer" value="{!question.answers}">
+                <div>
+                    {!answer}
+                </div>
+            </apex:repeat> 
+            <div>&nbsp;</div>
+            <div>Your Answer: {!question.playerAnswer}</div>
+            <div>Right Answer: {!question.correctAnswer}</div>
+            <div>&nbsp;</div>
+        </div>
+    </apex:repeat>
+</apex:component>

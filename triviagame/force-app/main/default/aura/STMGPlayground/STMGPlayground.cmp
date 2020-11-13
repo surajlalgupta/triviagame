@@ -1,0 +1,135 @@
+<aura:component implements="force:appHostable" controller="STMGPlaygroundCtlr">
+    <!-- ATTRIBUTES -->
+    <aura:attribute name="isNewGame" type="Boolean" default="true" description="status of the game before clicking on `Start Game` button"/>
+    <aura:attribute name="hasLoaded" type="Boolean" default="false" description="status of the game after clicking on `Start Game` button and before clicking on `Ready` button"/>
+    <aura:attribute name="isPlaying" type="Boolean" default="false" description="status of the game after clicking on `Ready` button"/>
+    <aura:attribute name="hasEnded" type="Boolean" default="false" description="status of the game after clicking on `End Game` button"/>
+    <aura:attribute name="gameId" type="Integer" default="123456" description="unique identifier among all new or live games"/>
+    <aura:attribute name="gameLevel" type="Integer" default="0" description="0 indicates no game has been instantiated, 1 indicates game is in `NEW` status, 2 indicates game is in `LIVE` status, 3 indicates game has ended"/>
+    <aura:attribute name="subscription" type="Map" description="subscription object emitted after subscribing to the channel"/>
+    <aura:attribute name="liveQuestionSN" type="Integer" default="1" description="serial number of question on the screen"/>
+    <aura:attribute name="gameQuestions" type="Trivia_Game_Question__c[]" default="[]" description="list of all questions assigned randomly to the game"/>
+    <aura:attribute name="liveQuestion" type="Trivia_Game_Question__c" default="" description="the question that is currently on the screen"/>
+    <aura:attribute name="answerOptions" type="String[]" default="" description="list of answer options to choose from"/>
+    <aura:attribute name="numOfQuestions" type="Integer" description="number of questions to be asked in the game"/>
+    <aura:attribute name="participants" type="Object[]" description="list of participants"/>
+    <aura:attribute name="timeOfQuestion" type="Integer" description = "time since epoch in seconds when the question first loads on the screen"/>
+    <!-- EVENT HANDLERS -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!-- EMP API component -->
+    <lightning:empApi aura:id="empApi" />
+    
+    <!-- UI Code -->
+    <html>
+    	<head>
+        	<ltng:require styles="{!$Resource.bootstrapcss}"
+				scripts="{!join(',',$Resource.bootstrapjs,
+                                   $Resource.popper,
+                                   $Resource.jquery)}"
+        		afterScriptsLoaded="{!c.scriptsLoaded}" />
+        </head>
+        <body>
+        	<div class="text-center" style="height:84vh">
+                <div class="bg-info text-white" style="height:6vh;line-height:6vh;">
+                	<strong>Salesforce Trivia Game</strong>
+                </div>
+                <div class="container-fluid">
+                	<div class="row">
+                    	<div class="col-md-8" style="height:78vh;border-right:solid 1px #343a40;">
+                            <div class="row bg-dark text-white" style="display:flex;flex-direction:column">
+                                <aura:if isTrue="{!!v.isPlaying}">
+                            		<div class="text-center">Instructions</div>
+                                    <aura:set attribute="else">
+                                        <div class="text-center">Question {!v.liveQuestionSN} of {!v.numOfQuestions}</div>
+                                    </aura:set>
+                                </aura:if>    
+                            </div>
+                            <aura:if isTrue="{!v.isNewGame}">
+                                <div style="height:75vh;line-height:75vh;">
+                                    <input type="button" class="btn btn-primary btn-large" value="Start Game" onclick="{!c.loadGame}" />
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.hasLoaded}">
+                            	<div style="height:75vh;float:left;width:100%;text-align:left" class="py-5 px-3">
+                                    <div style="font-size:14px;line-height:0.9rem;">
+                                        <p>Please follow below instructions to join the game</p>
+                                        <p>1. Whatsapp 'join father-apartment' (without single quotes) to +14155238886.</p>
+                                        <p>2. If you have not registered for the game before, you will receive a link to register your details.</p>
+                                        <p>3. Enter your details (First Name, Last Name, Email, Age, Country, City and Profile Pic).</p>
+                                        <p>4. After submitting your details, Whatsapp 'JOIN {!v.gameId}' (without single quotes) to +14155238886.</p>
+                                        <p>5. For those who have already registered and didn't receive a link, follow instructions only on line 4.</p>
+                                        <p>6. Please make sure to check your name in the leaderboard before game is launched.</p>
+                                    </div>    
+                                	<div class="text-center px-3 float-right py-3">
+                                        <input type="button" class="btn btn-primary btn-large" value="Ready" onclick="{!c.launchGame}"/>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.isPlaying}">
+                                <div style="height:75vh;float:left;width:100%;text-align:left" class="py-5 px-3">
+                                    <div style="font-size:14px;line-height:0.9rem;">
+                                        <p>{!v.liveQuestion.Trivia_Question__r.Question__c}</p>
+                                        <br/>
+                                        <aura:iteration var="ansOption" items="{!v.answerOptions}" >
+                                        	<p>{!ansOption}</p>
+                                        </aura:iteration>
+                                    </div>    
+                                	<div class="text-center px-3 float-right py-3">
+                                        <aura:if isTrue="{!v.numOfQuestions > v.liveQuestionSN}">
+                                        	<input type="button" class="btn btn-primary btn-large" value="Next" onclick="{!c.loadNextQuestion}"/>
+                                    		<aura:set attribute="else">
+                                                <input type="button" class="btn btn-primary btn-large" value="End Game" onclick="{!c.endGame}"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                </div>    
+                            </aura:if>
+                            <aura:if isTrue="{!v.hasEnded}">
+                                <div style="height:50vh;overflow-y:scroll;" class="py-5 px-3">
+                                    <div class="text-center">Game Result</div>
+                                    <div style="height:6vh;line-height:6vh;margin-bottom:1vh;border-bottom:solid 1px lightgrey;">
+                                        <div class="px-2" style="width:60%;text-align:left;display:inline-block;">Name</div>
+                                        <div class="px-2" style="width:20%;text-align:left;display:inline-block;">Score</div>
+                                    </div>
+                                    <aura:iteration var="player" items="{!v.participants}" indexVar="idx">
+                                        <div style="height:6vh;line-height:6vh;margin-bottom:1vh;border-bottom:solid 1px lightgrey;">
+                                            <div class="px-2" style="width:60%;text-align:left;display:inline-block;">{!idx+1}.&nbsp;&nbsp;{!player.name}</div>
+                                            <div class="px-2" style="width:20%;text-align:left;display:inline-block;">{!player.score}</div>    
+                                        </div>
+                                    </aura:iteration>
+                                    <!--<input type="button" class="btn btn-primary btn-large" value="Start Game" onclick="{!c.loadGame}" />-->
+                            	</div> 
+                            </aura:if>
+                        </div>
+                        <div class="col-md-4" style="height:78vh;border-right: solid 1px #343a40;background-color:#fff;">
+                        	<div class="row bg-dark text-white" style="display:flex;flex-direction:column">
+                            	<div class="text-center">Leaderboard</div>
+                            </div>
+                            <div style="height:75vh;overflow-y:scroll;">
+                                <div style="height:6vh;line-height:6vh;margin-bottom:1vh;border-bottom:solid 1px lightgrey;">
+                                    <div class="px-2" style="width:60%;text-align:left;display:inline-block;">Name</div>
+                                    <div class="px-2" style="width:20%;text-align:left;display:inline-block;">Score</div>
+                                    <div class="px-2" style="width:20%;text-align:left;display:inline-block;">Answer</div>
+                                </div>
+                                <aura:iteration var="player" items="{!v.participants}" indexVar="idx">
+                                    <div style="height:6vh;line-height:6vh;margin-bottom:1vh;border-bottom:solid 1px lightgrey;">
+                                        <div class="px-2" style="width:60%;text-align:left;display:inline-block;">{!idx+1}.&nbsp;&nbsp;{!player.name}</div>
+                                        <div class="px-2" style="width:20%;text-align:left;display:inline-block;">{!player.score}</div>
+                                        <aura:if isTrue="{!player.answered}">
+                                        	<div class="px-2" style="width:20%;text-align:left;display:inline-block;">&#10004;</div>
+                                            <aura:set attribute="else">
+                                                <div class="px-2" style="width:20%;text-align:left;display:inline-block;"></div>
+                                            </aura:set>
+                                        </aura:if>    
+                                    </div>
+                                </aura:iteration>
+                                <!--<input type="button" class="btn btn-primary btn-large" value="Start Game" onclick="{!c.loadGame}" />-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </html>
+</aura:component>

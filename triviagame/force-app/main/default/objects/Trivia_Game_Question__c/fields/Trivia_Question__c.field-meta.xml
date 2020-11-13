@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Trivia_Question__c</fullName>
+    <description>Salesforce Trivia Multiplayer Game: master-detail to trivia question</description>
+    <externalId>false</externalId>
+    <inlineHelpText>master-detail to trivia question</inlineHelpText>
+    <label>Trivia Question</label>
+    <referenceTo>Trivia_Question__c</referenceTo>
+    <relationshipLabel>Trivia Game Questions</relationshipLabel>
+    <relationshipName>Trivia_Game_Questions</relationshipName>
+    <relationshipOrder>1</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

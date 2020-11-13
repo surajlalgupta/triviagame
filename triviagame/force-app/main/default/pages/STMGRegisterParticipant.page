@@ -1,0 +1,272 @@
+<!--
+TO-DOs List
+1. Allow user to update profile or prevent update at all, if user already exists don't show the form
+2. Should allow the user to remove and add again the profile photo added via the file input
+3. Should implement a spinner during ajax requests
+4. Should add server-side validations too
+5. Provide drop-downs for country and city
+
+Good to have
+1. Inline validate, validate the moment controls are updated and error message shows up near the control
+2. Preview the profile photo added via the file input
+3. Persist the view state on page refresh. Note: View state is not maintained by the platform for force.com sites.
+4. Add extra layer of security by mobile and email OTP verification.
+5. Improve look and feel of the UI.
+-->
+<apex:page controller="STMGRegisterParticipantCtlr" showHeader="false" sidebar="false" standardStylesheets="false" docType="html-5.0">
+    <html>
+        <head>
+            <!--<apex:stylesheet value="{!URLFOR($Resource.Bootstrap, '/css/bootstrap.min.css')}"/> -->
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"/>       
+        </head>
+        <body>
+            <apex:slds />
+            <div class="slds-scope">
+                <div id="successDiv" style="display:none">
+                    <div class="container-fluid" style="margin:auto;width:40%;margin-top:100px;border: solid 1px lightgrey; border-radius:4px;">
+                        <div class="row">
+                            <div class="col-xs-12 col-md-12 text-center text-success">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading py-4">
+                                        <strong>
+                                            <div class="text-success">Registration Successful.</div>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+    		<div class="slds-scope">
+                <div id="formDiv" style="display:block">
+                    <div class="container-fluid" style="margin:auto;width:40%;margin-top:100px;border: solid 1px lightgrey; border-radius:4px;">
+                        <div class="row">
+                            <div class="col-xs-12 col-md-12 text-center">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading py-4">
+                                        <strong>Registration Form</strong>
+                                    </div>
+                                    <!-- SPINNER -->
+                                        <div id="spinner" class="slds-spinner_container slds-is-relative" >
+                                            <div role="status" class="slds-spinner slds-spinner--large slds-spinner--brand">
+                                                <div class="slds-spinner__dot-a"></div>
+                                                <div class="slds-spinner__dot-b"></div>
+                                            </div>
+                                        </div>
+                                	<!-- / SPINNER -->
+                                    <div class="panel-body">    
+                                        <div class="row">
+                                            <div class="col-xs-12 col-md-12">
+                                                <div class="form-group">
+                                                    <!--<label for="firstNameInp" style="float:left">First Name <span style="color:red;">*</span></label>-->
+                                                    <span style="color:red;float:left;">*</span>
+                                                    <input id="firstNameInp" type="text" class="form-control" placeholder="First Name"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-md-12">
+                                                <div class="form-group">
+                                                    <!--<label for="lastNameInp" style="float:left">Last Name</label>-->
+                                                    <input id="lastNameInp" type="text" class="form-control" placeholder="Last Name"/>
+                                                </div>
+                                            </div>             
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12 col-md-12">
+                                                <div class="form-group">
+                                                    <!--<label for="emailInp" style="float:left">Email Address <span style="color:red;">*</span></label>-->
+                                                    <span style="color:red;float:left">*</span>
+                                                    <input id="emailInp" type="email" class="form-control" placeholder="Email Address"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-md-12">
+                                                <div class="form-group">
+                                                    <!--<label for="ageInp" style="float:left">Age</label>-->
+                                                    <input id="ageInp" type="number" min="5" max="150" class="form-control" placeholder="Age"/>
+                                                </div>
+                                            </div>             
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12 col-md-12">
+                                                <div class="form-group">
+                                                    <!--<label for="countryInp" style="float:left">Country</label>-->
+                                                    <input id="countryInp" type="text" class="form-control" placeholder="Country"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-md-12">
+                                                <div class="form-group">
+                                                    <!--<label for="cityInp" style="float:left">City</label>-->
+                                                    <input id="cityInp" type="text" class="form-control" placeholder="City"/>
+                                                </div>
+                                            </div>             
+                                        </div>                
+                                        <div class="row py-3">
+                                            <div class="col-xs-12 col-md-12">
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="profilePhotoInp" onchange="onFileChange(event);"/>
+                                                    <label class="custom-file-label" for="profilePhotoInp" id="profilePhotoLabel">Browse Profile Photo</label>
+                                                </div>
+                                            </div>            
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12 col-md-12">
+                                                <input type="hidden" id="mobileNumberInp" value="{!$CurrentPage.Parameters.mobile}"/>
+                                            </div>    
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12 col-md-12 text-danger">
+                                                <div class="text-danger" id="errorsDiv"></div>
+                                            </div>    
+                                        </div>
+                                        <div class="row py-3">
+                                            <div class="col-xs-12 col-md-12">
+                                                <div class="form-group">
+                                                    <input type="button" id="submit" class="btn btn-primary" style="color:white;" value="Submit" onclick="onSubmit(event);" />
+                                                </div>
+                                            </div>            
+                                        </div>                
+                                    </div>                
+                                </div>                    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>             
+            <script type="text/javascript">
+                $(document).ready(function() {
+					$('#spinner').addClass('slds-show');
+                	$('#spinner').removeClass('slds-hide');
+                    var mobileNumber = $("#mobileNumberInp").val().trim();
+                    mobileNumber = mobileNumber.substr(0,1) == '+' ? mobileNumber : '+' +mobileNumber;
+                    STMGRegisterParticipantCtlr.getDetails(mobileNumber, function(result, event){
+                        $('#spinner').addClass('slds-hide');
+                		$('#spinner').removeClass('slds-show');
+                        console.log(result);
+                        if (event.status && result && result && result != null){
+                            $("#firstNameInp").val(result.First_Name__c);
+                            $("#lastNameInp").val(result.Last_Name__c);
+                            $("#ageInp").val(result.Age__c);
+                            $("#countryInp").val(result.Country__c);
+                            $("#cityInp").val(result.City__c);
+                            $("#emailInp").val(result.Email_Address__c); 
+                        }
+                        else{
+                            console.log('exception while fetching participant details');
+                        }   
+                    });  
+                });
+                function onFileChange(e){
+                    var fileName = e.target.files[0].name; 
+                    $("#profilePhotoLabel").text(fileName);
+                }
+                function onSubmit(e){
+                    e.preventDefault();
+                    var firstName = $("#firstNameInp").val();
+                    var lastName = $("#lastNameInp").val();
+                    var age = $("#ageInp").val();
+                    var country = $("#countryInp").val();
+                    var city = $("#cityInp").val();
+                    var email = $("#emailInp").val(); 
+                    var mobileNumber = $("#mobileNumberInp").val().trim();
+                    mobileNumber = mobileNumber.substr(0,1) == '+' ? mobileNumber : '+' +mobileNumber;
+                    var fr, fileData, fileName;
+                      
+                    var fileInpElem = document.getElementById('profilePhotoInp');
+                    if (!fileInpElem.files) {
+                        alert("This browser doesn't seem to support the `files` property of file inputs.");
+                        return;
+                    }
+                    else if (!fileInpElem.files[0]) {
+                        console.log("no file selected");  
+                        submitData(false);
+                    }
+                    else if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+                        alert('The File APIs are not fully supported in this browser.');
+                        return;
+                    } 
+                    else {
+                        var file = fileInpElem.files[0];
+                        fileName = file.name;
+                        console.log(fileName);
+                        fr = new FileReader();            
+                        fr.onload = finishedReadingFile;
+                        fr.readAsDataURL(file);
+                    }
+                    
+                    function validateData(){
+                        var errors = [];
+                        if (!firstName){
+                            errors.push('First Name is required');
+                        }
+                        if (!email){
+                            errors.push('Email Address is required');
+                        }
+                        var ageInNumbers = parseInt(age);
+                        if (age && (age < 5 || age > 150)){
+                            errors.push('Age should be between 5 and 150');
+                        }
+                        return errors;
+                    }
+                    
+                    function finishedReadingFile() {
+                        fileData = fr.result;
+                        submitData(true);
+                    }
+                    
+                    function submitData(hasFile){
+                        var errors = validateData();
+                        console.log(errors);
+                        if (errors && errors.length > 0){
+                            var errorsElem = '';
+                            errors.forEach(function(item, index, self){
+                                errorsElem += '<div>'+item+'</div>';
+                            });
+                            $("#errorsDiv").html(errorsElem);
+                        }
+                        else{
+                            var dataObj = {};
+                            dataObj.firstName = firstName;
+                            dataObj.lastName = lastName;
+                            dataObj.country = country;
+                            dataObj.city = city;
+                            dataObj.age = age !== '' ? age : null;
+                            dataObj.email = email;
+                            dataObj.mobileNumber = mobileNumber;
+                            if (hasFile){
+                                dataObj.fileName = fileName;
+                                dataObj.file = fileData;
+                            }
+                            console.log(dataObj);
+                            var data = JSON.stringify(dataObj);
+                            console.log(data);
+                            $('#spinner').addClass('slds-show');
+                			$('#spinner').removeClass('slds-hide');
+                            STMGRegisterParticipantCtlr.registerParticipant(data, function(result, event){
+                                $('#spinner').addClass('slds-hide');
+                				$('#spinner').removeClass('slds-show');
+                                console.log(result);
+                                if (event.status && result && result && result != null && result.isSuccess){
+                                    $("#successDiv").show();
+                                    $("#formDiv").hide();
+                                }
+                                else{
+                                    if (result.error && result.error.message){
+                                        $("#errorsDiv").text(result.error.message[0]);
+                                    }
+                                    else{
+                                        $("#errorsDiv").text('Registration failed. Please contact Program Administrator!');
+                                    }
+                                }   
+                            });
+                        }    
+                    }    
+                    
+                }    
+            </script>    
+        </body>
+    </html>
+    
+</apex:page>
