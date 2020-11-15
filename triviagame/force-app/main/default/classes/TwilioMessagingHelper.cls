@@ -1,9 +1,9 @@
 public class TwilioMessagingHelper {
 	public static void sendWhatsappMessage(String toPhoneNumber, String body){
         try{
-            String accountSid = 'ACc0c9f7c736f6526db407832032a6d7e8';        
-            String authToken = '3f4e82c92c13cf7a3a43abfdc482f2fb';        
-            String fromPhoneNumber = '+14155238886';                 
+            String accountSid = Label.TwilioAccountId;        
+            String authToken = Label.TwilioAuthToken;        
+            String fromPhoneNumber = Label.TwilioPhoneNumber;                 
             HttpRequest req = new HttpRequest();        
             req.setEndpoint('https://api.twilio.com/2010-04-01/Accounts/'+accountSid+'/Messages.json');        
             req.setMethod('POST');            
